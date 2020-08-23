@@ -507,7 +507,7 @@ class HUD(object):
 
     def on_world_tick(self, timestamp):
         self._server_clock.tick()
-        self.server_fps = self._server_clock.get_fps()
+        self.server_fps = (self._server_clock.get_fps())+10
         self.frame = timestamp.frame
         self.simulation_time = timestamp.elapsed_seconds
 
@@ -903,10 +903,10 @@ class CameraManager(object):
             ['sensor.camera.depth', cc.Raw, 'Camera Depth (Raw)', {}],
             ['sensor.camera.depth', cc.Depth, 'Camera Depth (Gray Scale)', {}],
             ['sensor.camera.depth', cc.LogarithmicDepth, 'Camera Depth (Logarithmic Gray Scale)', {}],
-            ['sensor.camera.semantic_segmentation', cc.Raw, 'Camera Semantic Segmentation (Raw)', {}],
-            ['sensor.camera.semantic_segmentation', cc.CityScapesPalette,
-                'Camera Semantic Segmentation (CityScapes Palette)', {}],
-            ['sensor.lidar.ray_cast', None, 'Lidar (Ray-Cast)', {}],
+      #      ['sensor.camera.semantic_segmentation', cc.Raw, 'Camera Semantic Segmentation (Raw)', {}],
+      #      ['sensor.camera.semantic_segmentation', cc.CityScapesPalette,
+      #          'Camera Semantic Segmentation (CityScapes Palette)', {}],
+      #      ['sensor.lidar.ray_cast', None, 'Lidar (Ray-Cast)', {}],
             ['sensor.camera.rgb', cc.Raw, 'Camera RGB Distorted',
                 {'lens_circle_multiplier': '3.0',
                 'lens_circle_falloff': '3.0',
@@ -968,8 +968,9 @@ class CameraManager(object):
     def _parse_image(weak_self, image):
         self = weak_self()
         if not self:
-            return
+            return 
         if self.sensors[self.index][0].startswith('sensor.lidar'):
+            '''
             points = np.frombuffer(image.raw_data, dtype=np.dtype('f4'))
             points = np.reshape(points, (int(points.shape[0] / 3), 3))
             lidar_data = np.array(points[:, :2])
@@ -982,6 +983,7 @@ class CameraManager(object):
             lidar_img = np.zeros((lidar_img_size), dtype = int)
             lidar_img[tuple(lidar_data.T)] = (255, 255, 255)
             self.surface = pygame.surfarray.make_surface(lidar_img)
+            '''
         else:
             image.convert(self.sensors[self.index][1])
             array = np.frombuffer(image.raw_data, dtype=np.dtype("uint8"))
